@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  flood:
+    build:
+      context: ./flood
+    image: flood-py
+    entrypoint: ["python3", "flood.py"]
+  tcp-server:
+    build:
+      context: ./server
+    image: node-tcp-server
+    command: ["node", "tcp-server.js"]
+    ports:
+      - "9001:9001"
+  udp-server:
+    build:
+      context: ./server
+    image: node-udp-server
+    command: ["node", "udp-server.js"]
+    ports:
+      - "9002:9002"
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - cadvisor
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    restart: unless-stopped
