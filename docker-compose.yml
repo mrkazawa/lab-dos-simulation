@@ -29,6 +29,10 @@ services:
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    command:
+      - '--housekeeping_interval=1s'
+      - '--max_housekeeping_interval=5s'
+      - '--storage_duration=1m0s'
     restart: unless-stopped
   prometheus:
     image: prom/prometheus:latest
@@ -49,4 +53,5 @@ services:
       - prometheus
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
     restart: unless-stopped
