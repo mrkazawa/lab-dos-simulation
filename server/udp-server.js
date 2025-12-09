@@ -9,7 +9,7 @@ let totalBytesReceived = 0;
 let cpuPacketsReceived = 0;
 let lastActivityTime = Date.now();
 let attackType = null; // 'cpu' or 'memory'
-const IDLE_TIMEOUT = 10000; // 10 seconds of no traffic = cleanup
+const IDLE_TIMEOUT = 300000; // 5 minutes of no traffic = cleanup
 const MEMORY_ATTACK_THRESHOLD = 4096; // Packets larger than 4KB are considered memory attacks
 
 const udpServer = dgram.createSocket('udp4');

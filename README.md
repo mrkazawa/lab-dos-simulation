@@ -30,7 +30,9 @@ This will start:
 
 ### 3. Run the Flood Script
 
-In a new terminal, run the flood service to generate load on the server. For example:
+In a new terminal, run the flood service to generate DoS attacks on the servers.
+
+**Quick Commands:**
 
 - **TCP Flood (CPU-bound):**
   ```
@@ -40,20 +42,21 @@ In a new terminal, run the flood service to generate load on the server. For exa
   ```
   docker compose run --rm flood -i udp-server -p 9002 -m udp-cpu
   ```
-- **TCP Memory Exhaustion (Memory-bound):**
+- **TCP Memory Exhaustion:**
   ```
-  docker compose run --rm flood -i tcp-server -p 9001 -m tcp-memory -s 50 -th 10
+  docker compose run --rm flood -i tcp-server -p 9001 -m tcp-memory
   ```
-- **UDP Memory Exhaustion (Memory-bound):**
+- **UDP Memory Exhaustion:**
   ```
-  docker compose run --rm flood -i udp-server -p 9002 -m udp-memory -s 50 -th 10
+  docker compose run --rm flood -i udp-server -p 9002 -m udp-memory
   ```
 
-**Parameters:**
+**Advanced Parameters:**
 - `-m`: Attack mode (tcp-cpu, udp-cpu, tcp-memory, udp-memory)
-- `-s 50`: Send 50 MB per connection (memory modes only)
-- `-th 10`: Use 10 concurrent connections
-- `-d 0.001`: Delay between sends in seconds (memory modes only)
+- `-th 5`: Number of concurrent connections (default: 5)
+- `-t 50000`: Packets per connection for CPU modes (default: 50000)
+- `-s 10`: Payload size in MB per connection for memory modes (default: 10)
+- `-d 0.001`: Delay between sends for memory modes (default: 0.001)
 - `--duration 300`: Attack duration in seconds (default: 300 = 5 minutes)
 
 ### 4. Observe the Impact
@@ -64,10 +67,10 @@ In a new terminal, run the flood service to generate load on the server. For exa
 - Watch the dashboard for spikes in CPU, memory, and network usage on the targeted server container
 
 **Timing Summary:**
-- **Prometheus scrapes metrics every 5 seconds** from cAdvisor
+- **Prometheus scrapes metrics every 15 seconds** from cAdvisor (with `honor_timestamps: false` to prevent data gaps)
 - **Grafana refreshes dashboard every 1 second** for visual updates
-- **Metrics use 30-second rate windows** for stable calculations
-- **Result: Graphs update 30-40 seconds after attack starts** (this is normal and expected)
+- **Metrics use 60-second rate windows** for smooth, stable graphs
+- **Result: Graphs update 60-90 seconds after attack starts** (this is normal and expected)
 
 ## Notes
 
@@ -77,11 +80,13 @@ In a new terminal, run the flood service to generate load on the server. For exa
 - Servers automatically detect attack type using header markers (CPU_ATTACK: or MEM_ATTACK:) sent by the flood client.
 - Memory is automatically released 10 seconds after attack traffic stops (for both TCP and UDP).
 - **Monitoring Pipeline**:
-  - cAdvisor collects container metrics (1s housekeeping interval)
-  - Prometheus scrapes cAdvisor every 5 seconds
-  - Grafana queries Prometheus using 30-second rate windows
+  - cAdvisor collects container metrics (10s housekeeping interval)
+  - Prometheus scrapes cAdvisor every 15 seconds with out-of-order sample ingestion enabled
+  - Out-of-order ingestion (5-minute window) prevents data loss from timestamp mismatches
+  - Grafana queries Prometheus using 60-second rate windows for smooth graphs
   - Dashboard refreshes every 1 second
-  - **Total latency: 30-40 seconds from attack start to graph display**
+  - **Total latency: 60-90 seconds from attack start to graph display**
+  - **Resource reservations ensure monitoring stability during attacks** (cAdvisor: 0.5 CPU + 128MB, Prometheus: 0.3 CPU + 256MB)
 - The real-time dashboard "DoS Simulation - Real-time" is automatically provisioned at http://localhost:3000
 - Stop all services with:
   ```

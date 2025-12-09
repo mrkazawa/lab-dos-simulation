@@ -86,7 +86,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(container_network_receive_bytes_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[30s])",
+          "expr": "rate(container_network_receive_bytes_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[60s])",
           "refId": "A",
           "legendFormat": "{{name}}"
         }
@@ -171,7 +171,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(container_network_transmit_bytes_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[30s])",
+          "expr": "rate(container_network_transmit_bytes_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[60s])",
           "refId": "A",
           "legendFormat": "{{name}}"
         }
@@ -256,7 +256,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "rate(container_cpu_usage_seconds_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[30s]) * 100",
+          "expr": "rate(container_cpu_usage_seconds_total{name=~\"lab-dos-simulation-(tcp|udp)-server-1\"}[60s]) * 100",
           "refId": "A",
           "legendFormat": "{{name}}"
         }

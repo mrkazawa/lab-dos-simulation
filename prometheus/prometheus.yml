@@ -1,7 +1,12 @@
 global:
-  scrape_interval: 5s
-  evaluation_interval: 5s
+  scrape_interval: 30s
+  evaluation_interval: 30s
 scrape_configs:
   - job_name: "cadvisor"
+    honor_timestamps: false
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: 'container_.*'
+        action: keep
     static_configs:
       - targets: ["cadvisor:8080"]
